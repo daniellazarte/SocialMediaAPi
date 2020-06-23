@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SocialMedia.Core.Entities;
+using SocialMedia.Infraestructure.Data.Configurations;
 //using SocialMedia.Infrastructure.Data.Configurations;
 
 namespace SocialMedia.Infrastructure.Data
@@ -25,6 +26,7 @@ namespace SocialMedia.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Luego quedaria Asi cuando tenemos las configuraciones por clases separadas Fluente API
             //modelBuilder.ApplyConfiguration(new CommentConfiguration());
             //modelBuilder.ApplyConfiguration(new PostConfiguration());
             //modelBuilder.ApplyConfiguration(new UserConfiguration());
