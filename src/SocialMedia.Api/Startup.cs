@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Infraestructure.Filters;
 using SocialMedia.Infraestructure.Repositories;
 using SocialMedia.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
+using System;
 
 namespace SocialMedia.Api
 {
@@ -39,7 +34,15 @@ namespace SocialMedia.Api
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
+            })
+
+             //Si deseas desactivar la validacion automatica de .Net Core CCon esta configuracion lo logras
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                //options.SuppressModelStateInvalidFilter = true;
+
             });
+            //fin de la configuracion
 
             services.AddControllers();
 
@@ -49,6 +52,15 @@ namespace SocialMedia.Api
             );
             //Resolver Dependencias Aqui
             services.AddTransient<IPostRepository, PostRepository>();
+            
+            //Registrar un ActionFilter Personalizado
+            services.AddMvc(Options =>
+            {
+                Options.Filters.Add<ValidationFilter>();
+            }).AddFluentValidation(Options =>
+            {
+                Options.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
