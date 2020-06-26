@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Api.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
@@ -40,8 +41,10 @@ namespace SocialMedia.Api.Controllers
             //La forma correcta de pasar con AutoMapper
             var posts = await _postRepository.GetPosts();
             //Usando Automapper
-            var postDTO = _mapper.Map<IEnumerable<PostDTO>>(posts);
-            return Ok(postDTO);
+            var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
+            //IMplementando la clase generica para los Resposne.
+            var response = new APIResponse<IEnumerable<PostDTO>>(postDTOs);
+            return Ok(response);
 
         }
 
@@ -59,7 +62,10 @@ namespace SocialMedia.Api.Controllers
             //    Image = post.Image,
             //    UserId = post.UserId
             //};
-            return Ok(postDTO);
+
+            //Implementando el API Response
+            var response = new APIResponse<PostDTO>(postDTO);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -77,7 +83,43 @@ namespace SocialMedia.Api.Controllers
             //Usando Automapper
             var post = _mapper.Map<Post>(postDTO);
             await _postRepository.InsertarPost(post);
-            return Ok(post);
+
+            //Convertirlo nuevamente para devolver DTO con el nuevo ID
+            postDTO = _mapper.Map<PostDTO>(post);
+            var response = new APIResponse<PostDTO>(postDTO);
+
+
+            return Ok(response);
+        }
+
+        //Atualizar un Nuevo Recurso POST HTTPPut
+        [HttpPut]
+        public async Task<IActionResult> Put(int id, PostDTO postDTO)
+        {
+
+            //Actualizar un Post con el verbo HTTPPut
+            var post = _mapper.Map<Post>(postDTO);
+            post.PostId = id;
+
+            var result = await _postRepository.UpdatePost(post);
+            
+            //Implementando el APIResponse
+            var response = new APIResponse<bool>(result);
+            return Ok(response);
+
+        }
+
+        //Eliminar un Recurso
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+
+            //Actualizar un Post con el verbo HTTPPut
+            //var post = _mapper.Map<Post>(postDTO); // NO Se requiere Mapeo
+            var result = await _postRepository.DeletePost(id);
+            //Implementando el APIResponse
+            var response = new APIResponse<bool>(result);
+            return Ok(response);
         }
     }
 }
