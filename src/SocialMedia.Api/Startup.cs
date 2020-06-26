@@ -7,7 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.Services;
 using SocialMedia.Infraestructure.Filters;
+using SocialMedia.Infraestructure.Interfaces;
 using SocialMedia.Infraestructure.Repositories;
 using SocialMedia.Infrastructure.Data;
 using System;
@@ -50,9 +52,12 @@ namespace SocialMedia.Api
             services.AddDbContext<SocialMediaContext>(Options =>
                 Options.UseSqlServer(Configuration.GetConnectionString("SocialMedia"))
             );
-            //Resolver Dependencias Aqui
+
+            //Registrando el Servicio IPostService
+            services.AddTransient<IPostService, PostService>();
             services.AddTransient<IPostRepository, PostRepository>();
-            
+            services.AddTransient<IUserRepository, UserRepository>();
+
             //Registrar un ActionFilter Personalizado
             services.AddMvc(Options =>
             {

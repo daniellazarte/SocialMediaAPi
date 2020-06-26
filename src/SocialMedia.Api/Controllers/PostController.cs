@@ -13,12 +13,13 @@ namespace SocialMedia.Api.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly IPostRepository _postRepository;
+        //private readonly IPostRepository _postRepository; // CAmbiado para que trabaje con el Post Service
+        private readonly IPostService _postService; // Con ctrl + RR se cambia para todas las cadenas Refactor
         //Inyectar el auto Mapper
         private readonly IMapper _mapper;
-        public PostController(IPostRepository postRepository, IMapper mapper)
+        public PostController(IPostService postService, IMapper mapper)
         {
-            _postRepository = postRepository;
+            _postService = postService;
             _mapper = mapper;
         }
 
@@ -39,7 +40,7 @@ namespace SocialMedia.Api.Controllers
             //return Ok(postsDTO);
 
             //La forma correcta de pasar con AutoMapper
-            var posts = await _postRepository.GetPosts();
+            var posts = await _postService.GetPosts();
             //Usando Automapper
             var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
             //IMplementando la clase generica para los Resposne.
@@ -51,7 +52,7 @@ namespace SocialMedia.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)
         {
-            var post = await _postRepository.GetPost(id);
+            var post = await _postService.GetPost(id);
             //Usando Automapper
             var postDTO = _mapper.Map<PostDTO>(post);
             //var postDTO  = new PostDTO
@@ -82,7 +83,7 @@ namespace SocialMedia.Api.Controllers
             
             //Usando Automapper
             var post = _mapper.Map<Post>(postDTO);
-            await _postRepository.InsertarPost(post);
+            await _postService.InsertarPost(post);
 
             //Convertirlo nuevamente para devolver DTO con el nuevo ID
             postDTO = _mapper.Map<PostDTO>(post);
@@ -101,7 +102,7 @@ namespace SocialMedia.Api.Controllers
             var post = _mapper.Map<Post>(postDTO);
             post.PostId = id;
 
-            var result = await _postRepository.UpdatePost(post);
+            var result = await _postService.UpdatePost(post);
             
             //Implementando el APIResponse
             var response = new APIResponse<bool>(result);
@@ -116,7 +117,7 @@ namespace SocialMedia.Api.Controllers
 
             //Actualizar un Post con el verbo HTTPPut
             //var post = _mapper.Map<Post>(postDTO); // NO Se requiere Mapeo
-            var result = await _postRepository.DeletePost(id);
+            var result = await _postService.DeletePost(id);
             //Implementando el APIResponse
             var response = new APIResponse<bool>(result);
             return Ok(response);
