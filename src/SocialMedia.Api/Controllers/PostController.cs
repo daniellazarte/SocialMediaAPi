@@ -24,7 +24,7 @@ namespace SocialMedia.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPosts()
+        public IActionResult GetPosts()
         {
             //La forma empirica, de convertir la respuesta a un DTO
             //var posts =await _postRepository.GetPosts();
@@ -40,7 +40,7 @@ namespace SocialMedia.Api.Controllers
             //return Ok(postsDTO);
 
             //La forma correcta de pasar con AutoMapper
-            var posts = await _postService.GetPosts();
+            var posts = _postService.GetPosts();
             //Usando Automapper
             var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
             //IMplementando la clase generica para los Resposne.

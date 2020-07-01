@@ -519,6 +519,7 @@
   <ItemGroup>
     <Compile Include="Data\Configurations\PostConfiguration.cs" />
     <Compile Include="Data\SocialMediaContext.cs" />
+    <Compile Include="Filters\GlobalExceptionFilter.cs" />
     <Compile Include="Filters\ValidationFilter.cs" />
     <Compile Include="Mappings\AutoMapperProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

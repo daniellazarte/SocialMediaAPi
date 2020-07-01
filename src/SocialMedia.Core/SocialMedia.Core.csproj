@@ -47,6 +47,7 @@
     <Compile Include="Entities\Post.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Entities\UserLogin.cs" />
+    <Compile Include="Exeptions\BussinessException.cs" />
     <Compile Include="Interfaces\IPostRepository.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
@@ -57,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enumerations\" />
-    <Folder Include="Exeptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

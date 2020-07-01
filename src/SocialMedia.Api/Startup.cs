@@ -32,7 +32,13 @@ namespace SocialMedia.Api
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             //Evitar referencias circulares TIP
-            services.AddControllers().AddNewtonsoftJson(options =>
+            //COnfigurar las Custom Exceptions
+            services.AddControllers( options => 
+            {
+                options.Filters.Add<GlobalExceptionFilter>();
+
+
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 

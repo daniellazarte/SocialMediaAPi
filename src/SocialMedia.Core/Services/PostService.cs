@@ -1,10 +1,9 @@
 ﻿using SocialMedia.Core.Entities;
+using SocialMedia.Core.Exeptions;
 using SocialMedia.Core.Interfaces;
-using SocialMedia.Infraestructure.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 //En esta clase haremnos las reglas de negocio, este servicio se encargara de eso.
@@ -30,10 +29,10 @@ namespace SocialMedia.Core.Services
             return await _unitOfWork.PostRepository.GetById(id);
         }
 
-        public async Task<IEnumerable<Post>> GetPosts()
+        public IEnumerable<Post> GetPosts()
         {
             //return await _postRepository.GetAll();
-            return await _unitOfWork.PostRepository.GetAll();
+            return  _unitOfWork.PostRepository.GetAll();
         }
 
         public async Task InsertarPost(Post post)
@@ -44,21 +43,36 @@ namespace SocialMedia.Core.Services
             var user = await _unitOfWork.UserRepository.GetById(post.UserId);
             if(user == null)
             {
-                throw new Exception("User doesnt Exist, Sorry");
+                throw new BussinessException("User doesnt Exist, Sorry");
             }
+            
+            var userPost = await _unitOfWork.PostRepository.GetPostsByUser(post.UserId);
+            //if (userPost.Count() < 10)
+            //{
+            //    var lastPost = userPost.OrderByDescending(x => x.Date).LastOrDefault();
+                
+            //    TimeSpan totaldias = (TimeSpan)(lastPost.Date - DateTime.Now);
+            //    int days = Math.Abs(totaldias.Days);
+            //    if (days < 7)
+            //    {
+            //        throw new Exception("You are not enable to publish ");
+            //    }
 
+            //}
             //Regla 2
             if (post.Description.Contains("Sexo"))
             {
-                throw new Exception("Content Sex not allowed. ");
+                throw new BussinessException("Content Sex not allowed. ");
             }
             
             await _unitOfWork.PostRepository.Add(post);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<bool>UpdatePost(Post post)
         {
-            await _unitOfWork.PostRepository.Update(post);
+            _unitOfWork.PostRepository.Update(post);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
