@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SocialMedia.Core.Entities
+﻿namespace SocialMedia.Core.Entities
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity //Abstracta por que no vamos a generar instancias de clase, solo para heredar.
     {
-        public int Id { get; set; }
-
+        public int id { get; set; }
     }
 }

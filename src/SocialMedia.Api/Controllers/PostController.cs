@@ -100,7 +100,7 @@ namespace SocialMedia.Api.Controllers
 
             //Actualizar un Post con el verbo HTTPPut
             var post = _mapper.Map<Post>(postDTO);
-            post.PostId = id;
+            post.id = id;
 
             var result = await _postService.UpdatePost(post);
             

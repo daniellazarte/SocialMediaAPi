@@ -12,22 +12,28 @@ namespace SocialMedia.Core.Services
 {
     public class PostService : IPostService
     {
-        private readonly IPostRepository _postRepository;
-        private readonly IUserRepository _userRepository;
-        public PostService(IPostRepository postRepository,IUserRepository userRepository)
+        //private readonly IRepository<Post> _postRepository;
+        //private readonly IRepository<User> _userRepository;
+        //private readonly IRepository<Comment> _commentRepository;
+        //Ahora Usamos el Unit OPf work ya no necesitaremos la dependencia de post ni de user
+
+        private readonly IUnitOfWork _unitOfWork;
+        public PostService(IUnitOfWork unitOfWork)
         {
-            _postRepository = postRepository;
-            _userRepository = userRepository;
+            //_postRepository = postRepository;
+            //_userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Post> GetPost(int id)
         {
-            return await _postRepository.GetPost(id);
+            return await _unitOfWork.PostRepository.GetById(id);
         }
 
         public async Task<IEnumerable<Post>> GetPosts()
         {
-            return await _postRepository.GetPosts();
+            //return await _postRepository.GetAll();
+            return await _unitOfWork.PostRepository.GetAll();
         }
 
         public async Task InsertarPost(Post post)
@@ -35,7 +41,7 @@ namespace SocialMedia.Core.Services
             //Regla 1 : Validar si el usuario Existe
             //Regla 2: No esta permitido hacer publicaciones que tengan referencia a Sexo
             //Usando la nueva interfaz para validar
-            var user = await _userRepository.GetUser(post.UserId);
+            var user = await _unitOfWork.UserRepository.GetById(post.UserId);
             if(user == null)
             {
                 throw new Exception("User doesnt Exist, Sorry");
@@ -47,17 +53,19 @@ namespace SocialMedia.Core.Services
                 throw new Exception("Content Sex not allowed. ");
             }
             
-            await _postRepository.InsertarPost(post);
+            await _unitOfWork.PostRepository.Add(post);
         }
 
         public async Task<bool>UpdatePost(Post post)
         {
-            return await _postRepository.UpdatePost(post);
+            await _unitOfWork.PostRepository.Update(post);
+            return true;
         }
 
         public async Task<bool> DeletePost(int id)
         {
-            return await _postRepository.DeletePost(id);
+            await _unitOfWork.PostRepository.Delete(id);
+            return true;
         }
     }
 }
