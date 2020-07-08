@@ -4,7 +4,10 @@ using SocialMedia.Api.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.QueryFilters;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
@@ -24,7 +27,9 @@ namespace SocialMedia.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetPosts()
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult GetPosts([FromQuery] PostQueryFilter filters) //Impotante el fromquery
         {
             //La forma empirica, de convertir la respuesta a un DTO
             //var posts =await _postRepository.GetPosts();
@@ -40,7 +45,7 @@ namespace SocialMedia.Api.Controllers
             //return Ok(postsDTO);
 
             //La forma correcta de pasar con AutoMapper
-            var posts = _postService.GetPosts();
+            var posts = _postService.GetPosts(filters);
             //Usando Automapper
             var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
             //IMplementando la clase generica para los Resposne.
