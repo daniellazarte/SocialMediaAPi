@@ -527,6 +527,8 @@
     <Compile Include="Repositories\PostRepository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Interfaces\IUriService.cs" />
+    <Compile Include="Services\UriService.cs" />
     <Compile Include="Validators\PostValidator.cs" />
   </ItemGroup>
   <ItemGroup />

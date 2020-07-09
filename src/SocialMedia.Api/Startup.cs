@@ -2,15 +2,19 @@ using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SocialMedia.Api.Controllers;
+using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
 using SocialMedia.Infraestructure.Filters;
 using SocialMedia.Infraestructure.Interfaces;
 using SocialMedia.Infraestructure.Repositories;
+using SocialMedia.Infraestructure.Services;
 using SocialMedia.Infrastructure.Data;
 using System;
 
@@ -41,6 +45,7 @@ namespace SocialMedia.Api
             }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
 
             })
 
@@ -59,12 +64,23 @@ namespace SocialMedia.Api
                 Options.UseSqlServer(Configuration.GetConnectionString("SocialMedia"))
             );
 
+            //COnfigurar Lectura de Appsettings en PAinationOptions
+            services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
+
             //Registrando el Servicio IPostService
             services.AddTransient<IPostService, PostService>();
             //services.AddTransient<IPostRepository, PostRepository>();
             //services.AddTransient<IUserRepository, UserRepository>();
             services.AddScoped(typeof(IRepository<>),typeof(BaseRepository<>));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            //Registrar el Servicio de IURIservice
+            services.AddSingleton<IUriService>(provider =>
+            {
+                var accesor = provider.GetRequiredService<IHttpContextAccessor>();
+                var request = accesor.HttpContext.Request;
+                var absoluteuri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+                return new UriService(absoluteuri);
+            });
 
             //Registrar un ActionFilter Personalizado
             services.AddMvc(Options =>

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿using SocialMedia.Core.CustomEntities;
+                                                    
 namespace SocialMedia.Api.Response
 {
     public class APIResponse<T> // T quiere decir que es un objeto generifico, y hay que especificarle el tipo de dato con el que va a trabajar
@@ -13,6 +10,8 @@ namespace SocialMedia.Api.Response
         }
         //Esta clase permite manejar las respuestas de nuestra API
         public T Data { get; set;}
+
+        public Metadata Meta  { get; set; }
 
     }
 }

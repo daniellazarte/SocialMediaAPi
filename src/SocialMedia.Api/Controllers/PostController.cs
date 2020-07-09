@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Configuration;
 using Newtonsoft.Json;
 using SocialMedia.Api.Response;
+using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Infraestructure.Interfaces;
 using SocialMedia.Core.QueryFilters;
 using System;
 using System.Collections.Generic;
@@ -21,13 +24,15 @@ namespace SocialMedia.Api.Controllers
         private readonly IPostService _postService; // Con ctrl + RR se cambia para todas las cadenas Refactor
         //Inyectar el auto Mapper
         private readonly IMapper _mapper;
-        public PostController(IPostService postService, IMapper mapper)
+        private readonly IUriService _uriservice;
+        public PostController(IPostService postService, IMapper mapper, IUriService uriservice)
         {
             _postService = postService;
             _mapper = mapper;
+            _uriservice = uriservice;
         }
 
-        [HttpGet]
+        [HttpGet(Name = nameof(GetPosts))]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult GetPosts([FromQuery] PostQueryFilter filters) //Impotante el fromquery
@@ -36,20 +41,24 @@ namespace SocialMedia.Api.Controllers
             var posts = _postService.GetPosts(filters);
             //Usando Automapper
             var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
-            //IMplementando la clase generica para los Resposne.
-            var response = new APIResponse<IEnumerable<PostDTO>>(postDTOs);
 
-            //Guardar en el header valores de paginacion
-            var metadata = new
+            //Guardar en el header valores de paginacion y en la respuesta
+            var metadata = new Metadata
             {
-                posts.TotalCount,
-                posts.PageSize,
-                posts.CurrentPage,
-                posts.TotalPages,
-                posts.HasNextPage,
-                posts.HasPreviousPage
+                TotalCount = posts.TotalCount,
+                PageSize = posts.PageSize,
+                CurrentPage = posts.CurrentPage,
+                Totalpages = posts.TotalPages,
+                HasNexttPage = posts.HasNextPage,
+                HasPreviousPage = posts.HasPreviousPage,
+                NextPageUrl = _uriservice.GetPostPaginationURI(filters, Url.RouteUrl(nameof(GetPosts))).ToString(),
+                PreviousPageUrl = _uriservice.GetPostPaginationURI(filters, Url.RouteUrl(nameof(GetPosts))).ToString()
 
             };
+
+            //IMplementando la clase generica para los Resposne.
+            var response = new APIResponse<IEnumerable<PostDTO>>(postDTOs) { Meta = metadata };
+
             Response.Headers.Add("x-Pagination", JsonConvert.SerializeObject(metadata));
             return Ok(response);
 
@@ -128,5 +137,9 @@ namespace SocialMedia.Api.Controllers
             var response = new APIResponse<bool>(result);
             return Ok(response);
         }
+    }
+
+    internal interface IUriservice
+    {
     }
 }
