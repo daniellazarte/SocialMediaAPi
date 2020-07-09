@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SocialMedia.Api.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
@@ -31,25 +32,25 @@ namespace SocialMedia.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult GetPosts([FromQuery] PostQueryFilter filters) //Impotante el fromquery
         {
-            //La forma empirica, de convertir la respuesta a un DTO
-            //var posts =await _postRepository.GetPosts();
-            //var postsDTO = posts.Select(x => new PostDTO
-            //{
-            //    PostId = x.PostId,
-            //    Date = x.Date,
-            //    Description = x.Description,
-            //    Image = x.Image,
-            //    UserId = x.UserId
-
-            //});
-            //return Ok(postsDTO);
-
             //La forma correcta de pasar con AutoMapper
             var posts = _postService.GetPosts(filters);
             //Usando Automapper
             var postDTOs = _mapper.Map<IEnumerable<PostDTO>>(posts);
             //IMplementando la clase generica para los Resposne.
             var response = new APIResponse<IEnumerable<PostDTO>>(postDTOs);
+
+            //Guardar en el header valores de paginacion
+            var metadata = new
+            {
+                posts.TotalCount,
+                posts.PageSize,
+                posts.CurrentPage,
+                posts.TotalPages,
+                posts.HasNextPage,
+                posts.HasPreviousPage
+
+            };
+            Response.Headers.Add("x-Pagination", JsonConvert.SerializeObject(metadata));
             return Ok(response);
 
         }
