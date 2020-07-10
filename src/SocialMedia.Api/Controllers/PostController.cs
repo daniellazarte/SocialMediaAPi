@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
@@ -32,8 +33,13 @@ namespace SocialMedia.Api.Controllers
             _uriservice = uriservice;
         }
 
+        /// <summary>
+        /// Retrive all Post and recive parameters for easy paggination.
+        /// </summary>
+        /// <param name="filters">Filters to apply for Pagging</param>
+        /// <returns></returns>
         [HttpGet(Name = nameof(GetPosts))]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(APIResponse<IEnumerable<PostDTO>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult GetPosts([FromQuery] PostQueryFilter filters) //Impotante el fromquery
         {
